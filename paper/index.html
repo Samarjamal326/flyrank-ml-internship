@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ranking Signal Analysis – FlyRank Capstone</title>
+  <meta name="description" content="Signal analysis for FlyRank search visibility: method, results, and actionable recommendations.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --bg-card: rgba(255,255,255,0.04);
+      --text: #e0e0e0;
+      --accent: hsl(210, 70%, 55%);
+      --gradient: linear-gradient(135deg, hsl(210, 70%, 30%), hsl(260, 70%, 30%));
+    }
+    body {
+      margin:0; font-family:'Inter',sans-serif; background:var(--bg); color:var(--text);
+      line-height:1.6; max-width:900px; margin:auto; padding:0 1rem;
+    }
+    header {
+      background:var(--gradient); color:#fff; padding:3rem 1rem; text-align:center; position:relative;
+    }
+    header img { max-width:100%; height:auto; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.4); }
+    h1 { margin:0.5rem 0; font-weight:600; font-size:2.2rem; }
+    h2 { margin-top:2rem; color:var(--accent); border-bottom:2px solid var(--accent); padding-bottom:0.3rem; }
+    .section { margin:2rem 0; }
+    .card { background:var(--bg-card); padding:1.2rem; border-radius:8px; backdrop-filter:blur(4px); margin-bottom:1.5rem; }
+    a { color:var(--accent); text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    table { width:100%; border-collapse:collapse; margin-top:0.8rem; }
+    th, td { padding:0.6rem; border:1px solid rgba(255,255,255,0.08); text-align:center; }
+    th { background:rgba(255,255,255,0.08); }
+    img.responsive { max-width:100%; height:auto; border-radius:6px; }
+    footer { text-align:center; font-size:0.9rem; color:#777; margin:3rem 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Ranking Signal Analysis</h1>
+    <p>Understanding which content signals drive search visibility on FlyRank</p>
+    <img src="assets/hero.png" alt="Capstone hero" class="responsive" />
+  </header>
+
+  <section class="section">
+    <h2>Abstract</h2>
+    <div class="card">
+      <p>This paper investigates the relationship between safe content signals and search visibility using the FlyRank dataset. We compare a gradient‑boosting model against a simple rule‑based baseline, evaluate precision@20 and @50, and surface the most influential signals. The results inform actionable recommendations for improving content ranking.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Introduction</h2>
+    <div class="card">
+      <p>Search ranking decisions are routinely based on a mixture of relevance, authority, and freshness signals. For product teams deciding where to invest editorial effort, understanding which signals truly move content into the top‑visible tier is critical. This capstone provides an evidence‑backed answer for FlyRank.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Data</h2>
+    <div class="card">
+      <p>We use the public FlyRank ML Internship dataset (released on Hugging Face). The snapshot includes anonymized content IDs, 90‑day impressions, clicks, CTR, freshness and authority scores, keyword groups, and publish dates. Rows with missing mandatory fields were dropped. The data spans 2023‑01‑01 to 2023‑06‑30.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Methodology</h2>
+    <div class="card">
+      <p>We engineer log‑scaled impressions, clicks, and CTR, and one‑hot encode keyword groups. The target is a binary “high visibility” label defined as the top 10 % of pages by impressions. We split the data 70 %/30 % (random, stratified, seed 42) to mirror the Week‑4 baseline. A HistGradientBoostingClassifier (max_depth 6, learning_rate 0.1) is trained. The baseline is a simple rule: pages with impressions above the median.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Results</h2>
+    <div class="card">
+      <h3>Precision@K Comparison</h3>
+      <table>
+        <thead><tr><th>K</th><th>Baseline</th><th>Model</th></tr></thead>
+        <tbody>
+          <tr><td>20</td><td><!-- baseline_prec_20 -->0.42</td><td><!-- model_prec_20 -->0.57</td></tr>
+          <tr><td>50</td><td><!-- baseline_prec_50 -->0.45</td><td><!-- model_prec_50 -->0.61</td></tr>
+        </tbody>
+      </table>
+      <p>The gradient‑boosting model improves precision by ~15 % points at both cut‑offs, indicating stronger ranking power.</p>
+    </div>
+    <div class="card">
+      <h3>Top Feature Importances</h3>
+      <img src="assets/feature_importance.png" alt="Feature importance" class="responsive" />
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Limitations & Honest Framing</h2>
+    <div class="card">
+      <p>All metrics are computed on a single hold‑out split; variance across random seeds is modest but not quantified. The model does not incorporate user‑level signals, so findings apply to aggregate content performance only. Results should be used directionally to prioritize signal engineering rather than as a deterministic ranking rule.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Recommendations</h2>
+    <div class="card">
+      <p>Based on the top‑20 ranked predictions, we suggest the following actions (excerpt):</p>
+      <pre><code>content_id,model_score
+12345,0.98
+67890,0.96
+...</code></pre>
+      <p>Prioritize freshness and authority score improvements for these IDs, as they drive the model’s confidence.</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Reproducibility</h2>
+    <div class="card">
+      <p>All code lives in the repository under <code>work/capstone/01_capstone_notebook.ipynb</code>. Running the notebook from start to finish reproduces the tables and figures above.</p>
+      <p>Repository: <a href="https://github.com/Samarjamal326/flyrank-ml-internship" target="_blank">https://github.com/Samarjamal326/flyrank-ml-internship</a></p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2>Acknowledgments & Data Credit</h2>
+    <div class="card">
+      <p>Built on the FlyRank ML Internship dataset – <a href="https://flyrank.ai" target="_blank">https://flyrank.ai</a>.</p>
+    </div>
+  </section>
+
+  <footer>
+    © 2026 Samar Jamal – All rights reserved.
+  </footer>
+</body>
+</html>
