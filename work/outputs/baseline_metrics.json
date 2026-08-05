@@ -1,0 +1,7 @@
+{
+  "baseline_precision_at_20": 0.45,
+  "baseline_precision_at_50": 0.44,
+  "base_rate": 0.5420666666666667,
+  "lift_over_base_rate": 0.8117082769647029,
+  "total_rows": 30000
+}
